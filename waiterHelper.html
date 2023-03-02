@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Waiter App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
     <style>
 
@@ -90,76 +90,73 @@
 
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-     function saveToLocalStorage(event){
-        
-        event.preventDefault();
-        const price = event.target.price.value;
-        const food = event.target.food.value;
-       
-        const selecting = event.target.category.value;
-        let obj={
-            price,food,selecting
-       
-        }
+     async function saveToLocalStorage(event) {
+        try {
+  event.preventDefault();
+  const price = event.target.price.value;
+  const food = event.target.food.value;
+  const selecting = event.target.category.value;
+  let obj = {
+    price,
+    food,
+    selecting
+  };
 
-       
-      axios.post("https://crudcrud.com/api/335423522d4046efb7d54fecab992ce3/appointmentData",obj)
-      .then(response=>{
-        showUserOnScreen(response.data);
-      })
-      .catch(error=>{
-        document.body.innerHTML=document.body.innerHTML+"<h4>Something went wrong</h4>";
-        console.log(error);
-      })
-       
-        
+ 
+    const response = await axios.post(
+      "https://crudcrud.com/api/7552e7d0a2294cb39a016a2f941c1b69/appointmentData",
+      obj
+    );
+    showUserOnScreen(response.data);
+  } catch (error) {
+    document.body.innerHTML =
+      document.body.innerHTML + "<h4>Something went wrong</h4>";
+    console.log(error);
+  }
+}
 
-        
-        
-
+async function showUserOnScreen(obj) {
+  let parentElem;
+  if (obj.selecting == "table1") {
+    parentElem = document.getElementById("listofitems1");
+  } else if (obj.selecting == "table2") {
+    parentElem = document.getElementById("listofitems2");
+  } else if (obj.selecting == "table3") {
+    parentElem = document.getElementById("listofitems3");
+  }
+  const childElem = document.createElement("li");
+  childElem.textContent = obj.price + "-" + obj.food;
+  const deleteElem = document.createElement("button");
+  deleteElem.appendChild(document.createTextNode("delete "));
+  deleteElem.addEventListener("click", async () => {
+    try {
+      const response = await axios.delete(
+        `https://crudcrud.com/api/7552e7d0a2294cb39a016a2f941c1b69/appointmentData/${obj._id}`
+      );
+      parentElem.removeChild(childElem);
+    } catch (error) {
+      console.log(error);
     }
-    function showUserOnScreen(obj){
-        let parentElem;
-        if(obj.selecting=='table1'){
-            parentElem=document.getElementById('listofitems1');
-        }
-        else if(obj.selecting=='table2'){
-            parentElem=document.getElementById('listofitems2')
-        }
-        else if(obj.selecting=='table3'){
-            parentElem=document.getElementById('listofitems3')
-        }
-        const childElem = document.createElement('li');
-        childElem.textContent=obj.price+'-'+obj.food;
-        const deleteElem = document.createElement('button');
-        deleteElem.appendChild(document.createTextNode('delete '));
-        deleteElem.addEventListener('click',()=>{
-            const response=axios.delete(`https://crudcrud.com/api/335423522d4046efb7d54fecab992ce3/appointmentData/${obj._id}`)
-            .then(reponse=>{
-                    parentElem.removeChild(childElem);
-            })
-            .catch(error=>{
-                console.log(error);
-            })
-            
-            
-        })
+  });
 
-        
-        childElem.appendChild(deleteElem);
-        parentElem.appendChild(childElem);
+  childElem.appendChild(deleteElem);
+  parentElem.appendChild(childElem);
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const response = await axios.get(
+      "https://crudcrud.com/api/7552e7d0a2294cb39a016a2f941c1b69/appointmentData"
+    );
+    for (let i = 0; i < response.data.length; i++) {
+      showUserOnScreen(response.data[i]);
     }
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-    document.addEventListener('DOMContentLoaded', () => {
-
-        axios.get("https://crudcrud.com/api/335423522d4046efb7d54fecab992ce3/appointmentData")
-        .then(response=>{
-            for(let i=0;i<response.data.length;i++){
-                showUserOnScreen(response.data[i]);
-            }
-        })
-       
-    });
 </script>
 
 </html>
